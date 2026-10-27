@@ -1,26 +1,187 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ---------------------------------------------------------------------------
+   Design tokens — calm, devotional palette
+   ------------------------------------------------------------------------- */
+@theme {
+  --color-ivory: #fbf7ef;       /* page background */
+  --color-cream: #f5ecdc;       /* soft section background */
+  --color-sand: #eadcc3;        /* borders, dividers */
+  --color-maroon: #7b1e2b;      /* primary accent */
+  --color-maroon-deep: #4f1119;  /* hero / footer */
+  --color-saffron: #d97a1f;     /* secondary accent */
+  --color-saffron-soft: #fbe6cc;
+  --color-gold: #c9a04a;        /* highlights */
+  --color-gold-light: #ecd9a6;
+  --color-ink: #2b211d;         /* body text */
+  --color-ink-soft: #5e4d44;    /* secondary text */
+
+  --font-body: var(--font-noto-serif-devanagari), "Noto Serif Devanagari", serif;
+  --font-display: var(--font-tiro-devanagari), "Tiro Devanagari Hindi", serif;
+
+  --shadow-card: 0 1px 2px rgb(79 17 25 / 0.05), 0 8px 24px -6px rgb(79 17 25 / 0.12);
+  --shadow-card-hover: 0 2px 4px rgb(79 17 25 / 0.06), 0 16px 36px -8px rgb(79 17 25 / 0.2);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html {
+  /* Large, comfortable reading size for elderly visitors (≈19px on phones, 20px on desktop). */
+  font-size: 118.75%;
+  scroll-padding-top: 6rem;
+  -webkit-text-size-adjust: 100%;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@media (min-width: 1024px) {
+  html { font-size: 125%; }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-ivory);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  line-height: 1.85;
+  text-rendering: optimizeLegibility;
+}
+
+/* Gentle paper texture + warm glow, no images needed. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgb(217 122 31 / 0.08), transparent 70%),
+    radial-gradient(800px 500px at 100% 100%, rgb(201 160 74 / 0.08), transparent 70%);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-saffron);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* ---------------------------------------------------------------------------
+   Text copied from the old site (rendered by <LegacyHtml>)
+   ------------------------------------------------------------------------- */
+@layer components {
+  .legacy-content {
+    overflow-wrap: anywhere; /* long dashed lines / numbers never cause sideways scrolling */
+  }
+  .legacy-content > * + * { margin-top: 1.1em; }
+  .legacy-content p { text-align: justify; text-justify: inter-word; hyphens: none; }
+  .legacy-content .text-center { text-align: center; }
+  .legacy-content h2 {
+    font-family: var(--font-display);
+    color: var(--color-maroon);
+    font-size: 1.5rem;
+    line-height: 1.5;
+    margin-top: 1.6em;
+  }
+  .legacy-content h2:first-child, .legacy-content > :first-child { margin-top: 0; }
+  .legacy-content h3 {
+    font-family: var(--font-display);
+    color: var(--color-maroon);
+    font-size: 1.2rem;
+    line-height: 1.55;
+    margin-top: 1.5em;
+  }
+  .legacy-content strong { color: var(--color-maroon-deep); font-weight: 700; }
+  .legacy-content u { text-decoration: none; }
+  /* Biography pages: the name line (bold + underlined in the old site) */
+  .legacy-content strong > u,
+  .legacy-content u > strong {
+    display: inline-block;
+    font-family: var(--font-display);
+    color: var(--color-maroon);
+    font-size: 1.35em;
+    line-height: 1.5;
+    padding-bottom: 0.15em;
+    border-bottom: 2px solid var(--color-gold);
+  }
+  .legacy-content ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+  .legacy-content ul.text-center { text-align: left; }
+  .legacy-content li {
+    background: white;
+    border: 1px solid var(--color-sand);
+    border-left: 4px solid var(--color-gold);
+    border-radius: 0.75rem;
+    padding: 0.7rem 1rem;
+  }
+  .legacy-content a {
+    color: var(--color-maroon);
+    text-decoration: underline;
+    text-decoration-color: var(--color-gold);
+    text-underline-offset: 4px;
+  }
+  .legacy-content img { border-radius: 1rem; }
+  .legacy-content figure.portrait {
+    margin-inline: auto;
+    max-width: 18rem;
+    background: white;
+    border-radius: 1.25rem;
+    padding: 0.75rem;
+    box-shadow: var(--shadow-card);
+  }
+  @media (min-width: 768px) {
+    .legacy-content figure.portrait { float: right; margin: 0.25rem 0 1rem 2rem; }
+  }
+  .legacy-content figure.portrait p {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--color-maroon);
+    font-weight: 600;
+    margin-top: 0.6rem;
+    text-align: center;
+  }
+  /* Satsang Aayojan table: a real table on wide screens, stacked cards on phones */
+  .legacy-content table { width: 100%; border-collapse: separate; border-spacing: 0 0.6rem; }
+  .legacy-content td {
+    background: white;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--color-sand);
+    border-bottom: 1px solid var(--color-sand);
+    vertical-align: top;
+  }
+  .legacy-content td:first-child { border-left: 4px solid var(--color-gold); border-radius: 0.75rem 0 0 0.75rem; }
+  .legacy-content td:last-child { border-right: 1px solid var(--color-sand); border-radius: 0 0.75rem 0.75rem 0; }
+  .legacy-content tr:first-child td {
+    background: var(--color-maroon);
+    color: white;
+    text-align: center;
+    border-radius: 0.75rem;
+    border: 0;
+  }
+  .legacy-content tr:first-child td strong { color: white; }
+  @media (max-width: 767px) {
+    .legacy-content table, .legacy-content tbody, .legacy-content tr, .legacy-content td { display: block; }
+    .legacy-content tr { margin-bottom: 0.9rem; border-radius: 0.75rem; overflow: hidden; box-shadow: var(--shadow-card); }
+    .legacy-content td,
+    .legacy-content td:first-child,
+    .legacy-content td:last-child { border: 0; border-radius: 0; padding: 0.4rem 1rem; }
+    .legacy-content tr td:first-child { padding-top: 0.8rem; border-left: 4px solid var(--color-gold); }
+    .legacy-content tr td:last-child { padding-bottom: 0.8rem; }
+    .legacy-content tr td:not(:first-child) { border-left: 4px solid var(--color-gold); }
+  }
+  /* Shapath Patra: blank lines to fill in by hand after printing */
+  .legacy-content .blank {
+    display: block;
+    height: 2.2rem;
+    border-bottom: 1.5px dashed var(--color-ink-soft);
+    margin-bottom: 0.5rem;
+  }
+}
+
+@media print {
+  header, footer, nav, [data-ui], .no-print { display: none !important; }
+  body { background: white; font-size: 12pt; }
+  body::before { display: none; }
+  .legacy-content li { border: 0; padding: 0; }
 }

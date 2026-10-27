@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# legacy media (served locally in dev via symlink; production media lives in Cloudflare R2)
+/public/legacy
+*.mp3
+*.pdf
