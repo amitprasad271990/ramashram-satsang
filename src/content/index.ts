@@ -44,3 +44,8 @@ export const FOOTER_LINKS = site.header.footerLinks.map((label) => ({
   label,
   href: ({ "मुख्यपृष्ठ": "/", "मूल साधना": "/moolsadhana", "उद्देश्य": "/udeshya", "सम्पर्क पता": "/amrit-vani" } as Record<string, string>)[label],
 }));
+
+/** The portrait shown on a biography page (the first image in its text). */
+export function bioImage(slug: PageSlug): string {
+  return pages[slug].html!.match(/src="legacy:([^"]+)"/)![1];
+}

@@ -10,7 +10,8 @@
     "extract": "node scripts/image-sizes.mjs && node scripts/extract-content.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "media": "node scripts/prepare-media.mjs"
   },
   "dependencies": {
     "html-react-parser": "^5.2.6",

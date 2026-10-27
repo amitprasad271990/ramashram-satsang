@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ramashram Satsang, Mathura (Mool Dhara) — website
 
-## Getting Started
+The new website for ramashramsatsang.co.in. Next.js + Tailwind CSS; Supabase
+(database, admin login) and Cloudflare R2 (audio, PDFs, photos) are added in
+Phase 2.
 
-First, run the development server:
+## Content rule
+
+All page text is copied **verbatim** from the old site by a script — it is never
+retyped or edited by hand. Automated tests compare every page with the old HTML,
+character by character, and fail if anything differs.
+
+- `scripts/extract-content.mjs` → `src/content/legacy/*.json` (do not edit these files)
+- `src/content/prakashan-transcript.ts` — the one exception: the Prakashan text
+  existed only as a picture, so it was typed out word for word (the picture is
+  still shown below it).
+
+## Running it on your computer
+
+The old site must sit next to this folder (`../www.ramashramsatsang.co.in`).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run media     # prepares the photos/audio/PDFs from the old site (once)
+npm run dev       # then open http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Useful commands
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command | What it does |
+|---|---|
+| `npm run extract` | Re-copy the text from the old site |
+| `npm run media` | Rebuild `.media/` from the old site (converts BMP pictures) |
+| `npm test` | Quick unit tests |
+| `npm run test:e2e` | Browser tests: same text as the old site, links, phone layout |
+| `npm run build` | Production build (what Vercel runs) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Media files are never committed to git.

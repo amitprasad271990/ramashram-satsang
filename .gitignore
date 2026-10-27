@@ -44,3 +44,8 @@ next-env.d.ts
 /public/legacy
 *.mp3
 *.pdf
+
+# prepared media (built by scripts/prepare-media.mjs)
+/.media
+/test-results
+/playwright-report

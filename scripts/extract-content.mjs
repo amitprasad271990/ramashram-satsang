@@ -65,8 +65,11 @@ function clean($, node, ctx = {}) {
       if (node.attribs?.type === "text") return `<span class="blank"></span>`;
       return ""; // the old "OK" button only showed an alert
     case "img": {
-      const src = node.attribs?.src ?? "";
+      let src = node.attribs?.src ?? "";
       if (!src || DECORATIVE.test(src)) return "";
+      // Biography pages used small thumbnails; the same portraits exist at full size.
+      const large = src.replace(/^Images\/th_lights(\d)\.jpg$/, "Images/lights$1.jpg");
+      if (large !== src && sizes[large]) src = large;
       const { width, height } = imageSize(src);
       return `<img src="legacy:${src}" width="${width}" height="${height}" alt="">`;
     }
@@ -282,11 +285,12 @@ const amritVaniPage = {
 
 // Mool Sadhana Shivir Kyon: heading + the 18 scanned booklet pages.
 const $ky = load("moolsadhanakyon.html");
+const kyonHeading = $ky("div.main p").first().text();
 const kyonPages = [...new Set($ky('img[src^="img/img"]').map((_, i) => $ky(i).attr("src")).get())];
 
 const write = (name, data) => fs.writeFileSync(path.join(OUT, name), JSON.stringify(data, null, 2) + "\n");
 write("pages.json", pages);
-write("site.json", { announcements, header, parichay, books, pravachanIndex, amritVaniPage, kyonPages });
+write("site.json", { announcements, header, parichay, books, pravachanIndex, amritVaniPage, kyonHeading, kyonPages });
 write("audio.json", { pages: audioPages, tracks: audio });
 
 console.log(`Extracted ${Object.keys(pages).length} pages, ${Object.keys(announcements).length} announcements,`,

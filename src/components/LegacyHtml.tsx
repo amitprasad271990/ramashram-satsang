@@ -24,8 +24,10 @@ export function LegacyHtml({ html, className = "" }: { html: string; className?:
                 width={width}
                 height={height}
                 alt=""
-                sizes="(min-width: 768px) 18rem, 80vw"
-                className="mx-auto h-auto w-full max-w-72 rounded-2xl shadow-[var(--shadow-card)]"
+                sizes="18rem"
+                // Small old photos are not stretched beyond ~1.6× (they would turn blurry).
+                style={{ maxWidth: Math.min(width * 1.6, 288) }}
+                className="mx-auto h-auto w-full rounded-2xl border-4 border-white shadow-[var(--shadow-card)] ring-1 ring-gold/50"
               />
             );
           }
