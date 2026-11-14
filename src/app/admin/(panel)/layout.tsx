@@ -9,7 +9,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   const { user } = await requireAdmin();
   return (
     <>
-      <header className="sticky top-0 z-30 border-b border-gold/40 bg-white/95 backdrop-blur">
+      <header className="z-30 border-b sm:sticky sm:top-0 border-gold/40 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
           <Link href="/admin" className="flex items-center gap-2 text-maroon">
             <LotusMark className="h-9 w-9" />

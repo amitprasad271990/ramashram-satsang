@@ -32,3 +32,17 @@ describe("mediaUrl with an empty setting", () => {
     vi.unstubAllEnvs();
   });
 });
+
+describe("mediaUrl for admin uploads", () => {
+  it("serves uploads from /local-media on this Mac", () => {
+    expect(mediaUrl("uploads/audio/bhajan/ab12.mp3")).toBe("/local-media/audio/bhajan/ab12.mp3");
+  });
+  it("serves everything from the bucket when a base address is set", async () => {
+    vi.stubEnv("NEXT_PUBLIC_MEDIA_BASE_URL", "https://media.example.org/");
+    vi.resetModules();
+    const { mediaUrl: fresh } = await import("@/lib/media");
+    expect(fresh("uploads/photo/a/x.jpg")).toBe("https://media.example.org/uploads/photo/a/x.jpg");
+    expect(fresh("Images/right.jpg")).toBe("https://media.example.org/Images/right.jpg");
+    vi.unstubAllEnvs();
+  });
+});

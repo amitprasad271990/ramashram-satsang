@@ -15,16 +15,14 @@ export default defineConfig({
   // 4 browsers at once: more makes this Mac too busy (photos resizing, audio) and tests flaky.
   workers: 4,
   // One retry; a test that passes only on retry is reported as "flaky" (not hidden).
-  // Known: very rarely the local image resizer never answers for Guruji_5x7.jpg
-  // when several sizes are requested at once (not seen with real users yet).
   retries: 1,
   reporter: [["list"]],
   use: { baseURL: `http://localhost:${PORT}` },
   projects: [
-    { name: "phone", use: { ...devices["Pixel 7"] }, testIgnore: /admin\.spec/ },
-    { name: "desktop", use: desktop, testIgnore: /admin\.spec/ },
+    { name: "phone", use: { ...devices["Pixel 7"] }, testIgnore: /admin.*\.spec/ },
+    { name: "desktop", use: desktop, testIgnore: /admin.*\.spec/ },
     // The admin tests change shared data (the announcement), so they run alone, after the others.
-    { name: "admin", use: desktop, testMatch: /admin\.spec/, dependencies: ["phone", "desktop"] },
+    { name: "admin", use: desktop, testMatch: /admin.*\.spec/, dependencies: ["phone", "desktop"] },
   ],
   webServer: {
     // Test the real production build (what visitors get). Set E2E_DEV=1 to use the dev server instead.

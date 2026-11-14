@@ -3,6 +3,12 @@
 /* ---------------------------------------------------------------------------
    Design tokens — calm, devotional palette
    ------------------------------------------------------------------------- */
+:root {
+  /* font names (files come from the @fontsource packages, imported in layout.tsx) */
+  --font-noto-serif-devanagari: "Noto Serif Devanagari";
+  --font-tiro-devanagari: "Tiro Devanagari Hindi";
+}
+
 @theme {
   --color-ivory: #fbf7ef;       /* page background */
   --color-cream: #f5ecdc;       /* soft section background */

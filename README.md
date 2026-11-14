@@ -37,6 +37,19 @@ accounts cannot sign up. The admin can:
 - see, search, download (Excel/CSV) and delete **Sadasya Shapath Patra**
   forms that visitors submit on `/sadasya-shapath-patra`;
 - change the announcement line shown on every page.
+- **Audio** (`/admin/audio`): upload many MP3s at once into Bhajanmala, Amrit
+  Vani or a pravachan shivir; edit titles; move up/down; delete.
+- **Photo albums** (`/admin/albums`): create / rename / delete albums; upload
+  many photos at once (resized in the browser to 2400 px); reorder; delete.
+
+Uploads go straight from the browser to storage with a signed address that
+is valid for 15 minutes:
+
+- on this Mac (`MEDIA_STORAGE=local`) into `.uploads/` (not in git), served at
+  `/local-media/…`;
+- going live (`MEDIA_STORAGE=r2`) into the S3/R2 bucket. Amazon S3: also set
+  `S3_REGION` (e.g. `ap-south-1`). The bucket needs a CORS rule allowing `PUT`
+  from the website's address.
 
 Visitors cannot read the submitted forms: the database allows only the admin.
 

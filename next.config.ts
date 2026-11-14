@@ -8,7 +8,9 @@ const nextConfig: NextConfig = {
   distDir: process.env.NEXT_DIST_DIR || ".next",
 
   images: {
-    formats: ["image/avif", "image/webp"],
+    // WebP only. AVIF encoding sometimes froze the image resizer under load
+    // (a photo then never loaded until the server restarted).
+    formats: ["image/webp"],
     // In production, images come from the Cloudflare R2 media address.
     remotePatterns: mediaBase ? [new URL(`${mediaBase.replace(/\/$/, "")}/**`)] : [],
   },

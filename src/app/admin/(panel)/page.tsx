@@ -35,6 +35,20 @@ export default async function AdminHome() {
             शिविर की नई तिथि, स्थान व संपर्क / New shivir dates, venue and contacts
           </p>
         </Link>
+        <Link
+          href="/admin/audio"
+          className="rounded-3xl border border-sand bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)]"
+        >
+          <p className="text-ink-soft">भजन, प्रवचन, अमृत वाणी / Audio</p>
+          <p className="mt-2 font-semibold text-maroon">MP3 अपलोड व नाम बदलें → / Upload & edit →</p>
+        </Link>
+        <Link
+          href="/admin/albums"
+          className="rounded-3xl border border-sand bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)]"
+        >
+          <p className="text-ink-soft">फोटो एल्बम / Photo albums</p>
+          <p className="mt-2 font-semibold text-maroon">एल्बम बनाएँ, चित्र अपलोड करें → / Create & upload →</p>
+        </Link>
       </div>
     </>
   );

@@ -1,21 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Serif_Devanagari, Tiro_Devanagari_Hindi } from "next/font/google";
+// Fonts are bundled with the site (no download from Google while building):
+// each file covers Hindi or Latin letters and the browser loads only what a page needs.
+import "@fontsource/noto-serif-devanagari/400.css";
+import "@fontsource/noto-serif-devanagari/600.css";
+import "@fontsource/noto-serif-devanagari/700.css";
+import "@fontsource/tiro-devanagari-hindi/400.css";
 import { site } from "@/content";
 import "./globals.css";
-
-const body = Noto_Serif_Devanagari({
-  variable: "--font-noto-serif-devanagari",
-  subsets: ["devanagari", "latin"],
-  weight: ["400", "600", "700"],
-  display: "swap",
-});
-
-const display = Tiro_Devanagari_Hindi({
-  variable: "--font-tiro-devanagari",
-  subsets: ["devanagari", "latin"],
-  weight: "400",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: { default: site.header.siteTitle, template: `%s | ${site.header.hindiTitle}` },
@@ -28,7 +19,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="hi" className={`${body.variable} ${display.variable}`}>
+    <html lang="hi">
       <body className="flex min-h-dvh flex-col antialiased">{children}</body>
     </html>
   );
