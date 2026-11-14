@@ -7,7 +7,8 @@ import { pages, site, type PageSlug } from "@/content";
 
 type Props = { params: Promise<{ slug: string }> };
 
-export const dynamicParams = false;
+// Unknown addresses get notFound() below. (`false` here breaks the refresh after an admin edit in Next 15.)
+export const dynamicParams = true;
 
 export function generateStaticParams() {
   return site.parichay.map((p) => ({ slug: p.slug }));

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { PageShell } from "@/components/PageShell";
 import { PlaylistHeader, TrackList } from "@/components/TrackList";
 import { audio, type PageSlug, type PravachanEvent } from "@/content";
+import { getCollection } from "@/lib/data";
 
 type Props = { params: Promise<{ event: string }> };
 
@@ -14,7 +15,8 @@ const OLD_PAGE: Record<PravachanEvent, PageSlug> = {
   "aurangabad-2013": "Pravachannew",
 };
 
-export const dynamicParams = false;
+// Unknown addresses get notFound() below. (`false` here breaks the refresh after an admin edit in Next 15.)
+export const dynamicParams = true;
 
 export function generateStaticParams() {
   return Object.keys(OLD_PAGE).map((event) => ({ event }));
@@ -27,11 +29,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PravachanEventPage({ params }: Props) {
   const event = (await params).event as PravachanEvent;
-  if (!(event in OLD_PAGE)) notFound();
+  const c = event in OLD_PAGE ? await getCollection(event) : null;
+  if (!c) notFound();
   return (
     <PageShell slug={OLD_PAGE[event]}>
-      <PlaylistHeader heading={audio.pages[event].heading} intro={audio.pages[event].intro} />
-      <TrackList tracks={audio.tracks.pravachan[event]} />
+      <PlaylistHeader heading={c.heading} intro={c.intro} />
+      <TrackList tracks={c.tracks} />
     </PageShell>
   );
 }

@@ -4,13 +4,14 @@ import { LegacyHtml } from "@/components/LegacyHtml";
 import { Divider } from "@/components/Ornaments";
 import { AnnouncementBar } from "@/components/PageShell";
 import { Portrait } from "@/components/Portrait";
-import { announcementFor, imageSize, pages, site } from "@/content";
+import { imageSize, pages, site } from "@/content";
+import { getAnnouncementFor } from "@/lib/data";
 import { mediaUrl } from "@/lib/media";
 
 const h = site.header;
 
-export default function HomePage() {
-  const announcement = announcementFor("home");
+export default async function HomePage() {
+  const announcement = await getAnnouncementFor("home");
   const poster = imageSize(h.founder.popup);
 
   return (

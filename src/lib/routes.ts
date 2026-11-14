@@ -1,12 +1,12 @@
 import { PAGES } from "../../scripts/page-map.mjs";
 import { MENU, QUICK_LINKS, site, type PageSlug } from "@/content";
 
-export type PageInfo = { slug: PageSlug; file: string; route: string; kind: "prose" | "custom" };
+export type PageInfo = { slug: PageSlug; file: string; route: string; kind: "prose" | "custom"; ownPage?: boolean };
 export const ALL_PAGES = PAGES as PageInfo[];
 
 /** Top-level text pages rendered by app/[page] (e.g. /udeshya). */
 export const TOP_LEVEL_PROSE = ALL_PAGES.filter(
-  (p) => p.kind === "prose" && p.route !== "/" && p.route.split("/").length === 2,
+  (p) => p.kind === "prose" && !p.ownPage && p.route !== "/" && p.route.split("/").length === 2,
 );
 
 /** Browser-tab title for a page, taken from its menu label. */

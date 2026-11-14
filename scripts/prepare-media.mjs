@@ -6,20 +6,25 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import sharp from "sharp";
+import ffmpeg from "ffmpeg-static";
 
 const OLD = path.resolve(process.argv[2] ?? "../www.ramashramsatsang.co.in");
 const OUT = path.resolve(".media");
 const MEDIA = /\.(mp3|pdf|jpe?g|png|gif|bmp|ico)$/i;
 
-/** Files whose contents are BMP regardless of extension → converted to PNG. */
-const isBmp = (file) => {
+const head = (file, n) => {
   const fd = fs.openSync(file, "r");
-  const b = Buffer.alloc(2);
-  fs.readSync(fd, b, 0, 2, 0);
+  const b = Buffer.alloc(n);
+  fs.readSync(fd, b, 0, n, 0);
   fs.closeSync(fd);
-  return b.toString("ascii") === "BM";
+  return b.toString("latin1");
 };
+/** Files whose contents are BMP regardless of extension → converted to PNG. */
+const isBmp = (file) => head(file, 2) === "BM";
+/** Phone recordings (AMR) saved with an .mp3 name; most browsers cannot play them. */
+const isAmr = (file) => head(file, 5) === "#!AMR";
 
 /** Decode an uncompressed 24/32-bit BMP (sharp cannot read BMP). */
 function readBmp(file) {
@@ -58,6 +63,10 @@ for (const rel of fs.readdirSync(OLD, { recursive: true })) {
     const png = dest.replace(/\.(bmp|png)$/i, ".png");
     await readBmp(src).png({ compressionLevel: 9 }).toFile(png);
     converted.push(`${rel} → ${path.relative(OUT, png)}`);
+  } else if (/\.mp3$/i.test(rel) && isAmr(src)) {
+    // Same recording, re-encoded as a real MP3 (mono speech, 64 kbps).
+    execFileSync(ffmpeg, ["-v", "error", "-i", src, "-ac", "1", "-b:a", "64k", dest]);
+    converted.push(`${rel} (AMR) → ${rel} (MP3)`);
   } else {
     fs.symlinkSync(src, dest);
     linked++;

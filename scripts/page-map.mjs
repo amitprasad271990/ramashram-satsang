@@ -20,7 +20,8 @@ export const PAGES = [
   { slug: "moolsadhanakyon", file: "moolsadhanakyon.html", route: "/moolsadhana-shivir-kyon", kind: "custom" },
   { slug: "karyakarini", file: "karyakarini.html", route: "/karyakarini", kind: "prose" },
   { slug: "prakashan", file: "prakashan.html", route: "/prakashan", kind: "custom" },
-  { slug: "sapathpatra", file: "sapathpatra.html", route: "/sadasya-shapath-patra", kind: "prose" },
+  // Text extracted like other pages, but the page has its own route (with the online form).
+  { slug: "sapathpatra", file: "sapathpatra.html", route: "/sadasya-shapath-patra", kind: "prose", ownPage: true },
   { slug: "prsanotary", file: "prsanotary.html", route: "/prashnottari", kind: "prose" },
   { slug: "sankasamadhan", file: "sankasamadhan.html", route: "/shanka-samadhan", kind: "prose" },
   { slug: "samparksutra", file: "samparksutra.html", route: "/amrit-vani", kind: "custom" },

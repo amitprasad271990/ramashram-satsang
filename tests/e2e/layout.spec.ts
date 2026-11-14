@@ -34,6 +34,7 @@ test("every link inside the site leads to a working page", async ({ page }) => {
 });
 
 test("old addresses redirect to the new pages", async ({ page }) => {
+  test.setTimeout(180_000); // visits every old address
   for (const p of PAGES) {
     await page.goto(`/${p.file}`);
     expect(new URL(page.url()).pathname, p.file).toBe(p.route);

@@ -1,18 +1,22 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 import { PageShell } from "@/components/PageShell";
 import { PlaylistHeader, TrackList } from "@/components/TrackList";
-import { audio, imageSize, site } from "@/content";
+import { imageSize, site } from "@/content";
+import { getCollection } from "@/lib/data";
 import { mediaUrl } from "@/lib/media";
 
 export const metadata: Metadata = { title: "अमृत वाणी" };
 
-export default function AmritVaniPage() {
+export default async function AmritVaniPage() {
+  const c = await getCollection("amrit-vani");
+  if (!c) notFound();
   const p = site.amritVaniPage;
   const size = imageSize(p.image);
   return (
     <PageShell slug="samparksutra">
-      <PlaylistHeader heading={p.heading} />
+      <PlaylistHeader heading={c.heading} />
       <figure className="mt-6 flex flex-col items-center">
         <Image
           src={mediaUrl(p.image)}
@@ -35,7 +39,7 @@ export default function AmritVaniPage() {
           {p.youtubeLabel}
         </a>
       </figure>
-      <TrackList tracks={audio.tracks.amritVani} />
+      <TrackList tracks={c.tracks} />
     </PageShell>
   );
 }

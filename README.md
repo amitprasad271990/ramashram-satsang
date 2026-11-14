@@ -21,9 +21,24 @@ The old site must sit next to this folder (`../www.ramashramsatsang.co.in`).
 
 ```bash
 npm install
+cp .env.example .env.local   # local settings (never committed)
 npm run media     # prepares the photos/audio/PDFs from the old site (once)
-npm run dev       # then open http://localhost:3000
+npm run db:start  # local Supabase in Docker (Docker Desktop must be running)
+npm run db:seed   # announcements, bhajan/pravachan lists, admin email (once)
+npm run admin:password   # set the admin password (typed hidden, once)
+npm run dev       # then open http://localhost:3000  (admin: /admin)
 ```
+
+## Admin portal (`/admin`)
+
+One admin (the email in `ADMIN_EMAIL`) logs in with email + password. New
+accounts cannot sign up. The admin can:
+
+- see, search, download (Excel/CSV) and delete **Sadasya Shapath Patra**
+  forms that visitors submit on `/sadasya-shapath-patra`;
+- change the announcement line shown on every page.
+
+Visitors cannot read the submitted forms: the database allows only the admin.
 
 ## Useful commands
 
@@ -32,7 +47,9 @@ npm run dev       # then open http://localhost:3000
 | `npm run extract` | Re-copy the text from the old site |
 | `npm run media` | Rebuild `.media/` from the old site (converts BMP pictures) |
 | `npm test` | Quick unit tests |
-| `npm run test:e2e` | Browser tests: same text as the old site, links, phone layout |
-| `npm run build` | Production build (what Vercel runs) |
+| `npm run test:e2e` | Browser tests on a production build: same text as the old site, links, phone layout, admin portal (needs `db:start`) |
+| `npm run build` | Production build |
+| `npm run db:start` / `db:stop` | Start / stop the local Supabase |
+| `npm run verify` | Check media files and database lists match the old site |
 
 Media files are never committed to git.

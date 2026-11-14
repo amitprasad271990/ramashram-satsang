@@ -4,6 +4,9 @@ import { PAGES } from "./scripts/page-map.mjs";
 const mediaBase = process.env.NEXT_PUBLIC_MEDIA_BASE_URL;
 
 const nextConfig: NextConfig = {
+  // The browser tests build into their own folder so a running `npm run dev` is not disturbed.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
+
   images: {
     formats: ["image/avif", "image/webp"],
     // In production, images come from the Cloudflare R2 media address.

@@ -7,13 +7,11 @@ import audioJson from "./legacy/audio.json";
 import imageSizes from "./legacy/image-sizes.json";
 
 export type PageSlug = keyof typeof pagesJson;
-export type AnnouncementKey = keyof typeof siteJson.announcements;
 
 export const pages = pagesJson;
 export const site = siteJson;
 export const audio = audioJson;
 
-export type Track = { order: number; title: string; file: string };
 export type PravachanEvent = keyof typeof audioJson.tracks.pravachan;
 
 /** Pixel size of an old-site image, e.g. "Images/right.jpg". */
@@ -21,16 +19,6 @@ export function imageSize(path: string): { width: number; height: number } {
   const size = (imageSizes as Record<string, { width: number; height: number }>)[path];
   if (!size) throw new Error(`Unknown image: ${path}`);
   return size;
-}
-
-/**
- * The shivir announcement shown on a page. Each old page showed one of two
- * announcement texts; Phase 2 moves these into the database so the admin can
- * edit them.
- */
-export function announcementFor(slug: PageSlug): string | null {
-  const key = pages[slug].announcement as AnnouncementKey | null;
-  return key ? site.announcements[key] : null;
 }
 
 /** The main menu, plus the photo album added at the end. */

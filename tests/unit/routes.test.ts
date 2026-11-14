@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { legacyToRoute, PAGES } from "../../scripts/page-map.mjs";
 import { mediaUrl } from "@/lib/media";
 
@@ -20,5 +20,15 @@ describe("mediaUrl", () => {
   it("serves old-site files from /legacy in development", () => {
     expect(mediaUrl("Images/right.jpg")).toBe("/legacy/Images/right.jpg");
     expect(mediaUrl("/bhajan/0.mp3")).toBe("/legacy/bhajan/0.mp3");
+  });
+});
+
+describe("mediaUrl with an empty setting", () => {
+  it("still serves from /legacy when NEXT_PUBLIC_MEDIA_BASE_URL is empty", async () => {
+    vi.stubEnv("NEXT_PUBLIC_MEDIA_BASE_URL", "");
+    vi.resetModules();
+    const { mediaUrl: fresh } = await import("@/lib/media");
+    expect(fresh("Images/right.jpg")).toBe("/legacy/Images/right.jpg");
+    vi.unstubAllEnvs();
   });
 });

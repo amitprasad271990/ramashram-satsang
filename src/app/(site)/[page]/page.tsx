@@ -7,7 +7,8 @@ import { TOP_LEVEL_PROSE, titleFor } from "@/lib/routes";
 
 type Props = { params: Promise<{ page: string }> };
 
-export const dynamicParams = false;
+// Unknown addresses get notFound() below. (`false` here breaks the refresh after an admin edit in Next 15.)
+export const dynamicParams = true;
 
 export function generateStaticParams() {
   return TOP_LEVEL_PROSE.map((p) => ({ page: p.route.slice(1) }));

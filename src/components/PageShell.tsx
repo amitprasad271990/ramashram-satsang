@@ -1,4 +1,5 @@
-import { announcementFor, type PageSlug } from "@/content";
+import type { PageSlug } from "@/content";
+import { getAnnouncementFor } from "@/lib/data";
 
 /** The shivir announcement line (a scrolling marquee on the old site). */
 export function AnnouncementBar({ text }: { text: string }) {
@@ -20,7 +21,7 @@ export function AnnouncementBar({ text }: { text: string }) {
  * Standard page frame: announcement bar, then the page content in a white card.
  * `slug` selects which announcement the old page showed.
  */
-export function PageShell({
+export async function PageShell({
   slug,
   children,
   wide = false,
@@ -31,7 +32,7 @@ export function PageShell({
   wide?: boolean;
   card?: boolean;
 }) {
-  const announcement = announcementFor(slug);
+  const announcement = await getAnnouncementFor(slug);
   return (
     <>
       {announcement && <AnnouncementBar text={announcement} />}
