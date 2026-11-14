@@ -12,7 +12,7 @@ export default async function BhajanmalaPage() {
   return (
     <PageShell slug="musicnew">
       <PlaylistHeader heading={c.heading} intro={c.intro} />
-      <TrackList tracks={c.tracks} />
+      <TrackList collection={c} href="/bhajanmala" searchLabel="भजन खोजें" />
     </PageShell>
   );
 }

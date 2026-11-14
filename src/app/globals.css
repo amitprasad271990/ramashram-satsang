@@ -185,3 +185,16 @@ body::before {
   body::before { display: none; }
   .legacy-content li { border: 0; padding: 0; }
 }
+
+/* "Now playing" bars in the playlist */
+@keyframes eq {
+  0%, 100% { height: 30%; }
+  50% { height: 100%; }
+}
+.eq-bar {
+  height: 60%;
+  animation: eq 0.9s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .eq-bar { animation: none; }
+}

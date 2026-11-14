@@ -34,7 +34,7 @@ export default async function PravachanEventPage({ params }: Props) {
   return (
     <PageShell slug={OLD_PAGE[event]}>
       <PlaylistHeader heading={c.heading} intro={c.intro} />
-      <TrackList tracks={c.tracks} />
+      <TrackList collection={c} href={`/pravachan/${event}`} />
     </PageShell>
   );
 }

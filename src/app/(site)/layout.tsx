@@ -1,10 +1,11 @@
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { PlayerProvider } from "@/components/player/PlayerProvider";
 
 /** Public pages: menu at the top, footer at the bottom. */
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <PlayerProvider>
       <a
         href="#main"
         data-ui
@@ -15,6 +16,6 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <SiteHeader />
       <div className="flex-1">{children}</div>
       <SiteFooter />
-    </>
+    </PlayerProvider>
   );
 }

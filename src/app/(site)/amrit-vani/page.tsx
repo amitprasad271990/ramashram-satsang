@@ -39,7 +39,7 @@ export default async function AmritVaniPage() {
           {p.youtubeLabel}
         </a>
       </figure>
-      <TrackList tracks={c.tracks} />
+      <TrackList collection={c} href="/amrit-vani" searchLabel="खोजें" />
     </PageShell>
   );
 }
