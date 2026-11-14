@@ -9,6 +9,7 @@ import fs from "node:fs";
 import path from "node:path";
 import pg from "pg";
 import { parseFile } from "music-metadata";
+import sharp from "sharp";
 import { dbSsl } from "./r2.mjs";
 
 const legacy = (f) => JSON.parse(fs.readFileSync(path.resolve("src/content/legacy", f), "utf8"));
@@ -25,6 +26,23 @@ const collections = [
     ...audio.pages[slug],
     tracks: audio.tracks.pravachan[slug],
   })),
+];
+
+// Starting photo album: the photographs that were already on the old site
+// (portraits and photo cards; decorations and duplicates left out).
+const STARTING_ALBUM = "सत्संग चित्र संग्रह";
+const STARTING_PHOTOS = [
+  "Images/top1.jpg",
+  "Images/left2new.jpg",
+  "Images/right.jpg",
+  "Images/Guruji_5x7.jpg",
+  "Images/Babuji.jpg",
+  "Images/lights1.jpg",
+  "Images/lights2.jpg",
+  "Images/lights3.jpg",
+  "Images/lights4.jpg",
+  "Images/lights9.jpg",
+  "Images/35.jpg",
 ];
 
 async function fileInfo(key) {
@@ -71,6 +89,25 @@ try {
       added += r.rowCount;
     }
     console.log(`✓ ${c.slug}: ${added} new of ${c.tracks.length} tracks`);
+  }
+
+  // Photo album (created once; later changes by the admin are kept).
+  let album = (await client.query("select id from public.photo_albums where title = $1", [STARTING_ALBUM])).rows[0];
+  if (!album) {
+    album = (await client.query("insert into public.photo_albums (title, sort_order) values ($1, 0) returning id", [STARTING_ALBUM])).rows[0];
+    let added = 0;
+    for (const [i, key] of STARTING_PHOTOS.entries()) {
+      const { width, height } = await sharp(path.join(MEDIA, key)).metadata();
+      const r = await client.query(
+        `insert into public.photos (album_id, storage_key, width, height, sort_order)
+         values ($1, $2, $3, $4, $5) on conflict (storage_key) do nothing`,
+        [album.id, key, width, height, i],
+      );
+      added += r.rowCount;
+    }
+    console.log(`✓ album "${STARTING_ALBUM}": ${added} photos`);
+  } else {
+    console.log(`✓ album "${STARTING_ALBUM}" already exists (left unchanged)`);
   }
 
   await client.query("commit");

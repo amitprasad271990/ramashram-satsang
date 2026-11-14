@@ -45,3 +45,52 @@ export const getCollection = cache(async (slug: string): Promise<AudioCollection
   if (error) throw error;
   return data as AudioCollection | null;
 });
+
+export type Photo = {
+  id: string;
+  storage_key: string;
+  width: number;
+  height: number;
+  caption: string | null;
+};
+
+export type AlbumSummary = {
+  id: string;
+  title: string;
+  count: number;
+  cover: Photo | null;
+};
+
+const PHOTO_COLS = "id, storage_key, width, height, caption";
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** All albums in order, each with its first photo as the cover. */
+export const getAlbums = cache(async (): Promise<AlbumSummary[]> => {
+  const { data, error } = await publicDb()
+    .from("photo_albums")
+    .select(`id, title, photos(${PHOTO_COLS}, sort_order)`)
+    .order("sort_order")
+    .order("created_at", { ascending: false })
+    .order("sort_order", { referencedTable: "photos" });
+  if (error) throw error;
+  return data.map((a) => ({
+    id: a.id,
+    title: a.title,
+    count: a.photos.length,
+    cover: a.photos[0] ?? null,
+  }));
+});
+
+/** One album with its photos in order (null if the address is unknown). */
+export const getAlbum = cache(async (id: string): Promise<{ id: string; title: string; photos: Photo[] } | null> => {
+  if (!UUID.test(id)) return null;
+  const { data, error } = await publicDb()
+    .from("photo_albums")
+    .select(`id, title, photos(${PHOTO_COLS})`)
+    .eq("id", id)
+    .order("sort_order", { referencedTable: "photos" })
+    .order("created_at", { referencedTable: "photos" })
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+});

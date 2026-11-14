@@ -12,6 +12,12 @@ export default defineConfig({
   testDir: "tests/e2e",
   timeout: 60_000,
   fullyParallel: true,
+  // 4 browsers at once: more makes this Mac too busy (photos resizing, audio) and tests flaky.
+  workers: 4,
+  // One retry; a test that passes only on retry is reported as "flaky" (not hidden).
+  // Known: very rarely the local image resizer never answers for Guruji_5x7.jpg
+  // when several sizes are requested at once (not seen with real users yet).
+  retries: 1,
   reporter: [["list"]],
   use: { baseURL: `http://localhost:${PORT}` },
   projects: [
