@@ -1,0 +1,23 @@
+# AWS Amplify build settings.
+# The values themselves live in Amplify → Hosting → Environment variables (never in git).
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - nvm install 22 && nvm use 22
+        - npm ci
+    build:
+      commands:
+        # Amplify does not hand its environment variables to the running website
+        # by itself: copy the server-side ones into .env.production for Next.js.
+        - env | grep -E '^(SUPABASE_SECRET_KEY|MEDIA_STORAGE|S3_BUCKET|S3_REGION)=' > .env.production
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - "**/*"
+  cache:
+    paths:
+      - .next/cache/**/*
+      - node_modules/**/*
