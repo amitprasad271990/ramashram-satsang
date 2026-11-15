@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MENU, QUICK_LINKS, site } from "@/content";
 import { LotusMark } from "./Ornaments";
 
@@ -13,20 +13,33 @@ function isActive(pathname: string, href: string) {
 export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  // Where the phone menu starts: just below the header (its height changes with text size).
+  const [menuTop, setMenuTop] = useState(64);
 
   // Close the mobile menu whenever the page changes.
   useEffect(() => setOpen(false), [pathname]);
 
-  // Lock page scrolling while the mobile menu is open.
+  // While the phone menu is open: lock page scrolling, and Escape closes it.
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    if (!open) return;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
     };
   }, [open]);
 
+  function toggleMenu() {
+    if (!open && headerRef.current) setMenuTop(Math.max(0, Math.round(headerRef.current.getBoundingClientRect().bottom)));
+    setOpen((v) => !v);
+  }
+
   return (
-    <header className="sticky top-0 z-40 border-b border-gold/40 bg-ivory/90 backdrop-blur-md supports-[backdrop-filter]:bg-ivory/80">
+    <>
+    <header ref={headerRef} className="sticky top-0 z-40 border-b border-gold/40 bg-ivory/90 backdrop-blur-md supports-[backdrop-filter]:bg-ivory/80">
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6">
         <Link href="/" className="group flex min-w-0 items-center gap-2.5">
           <LotusMark className="h-10 w-10 shrink-0 text-maroon transition-transform duration-500 group-hover:rotate-[8deg]" />
@@ -54,7 +67,7 @@ export function SiteHeader() {
         <button
           type="button"
           data-ui
-          onClick={() => setOpen((v) => !v)}
+          onClick={toggleMenu}
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? "मेनू बंद करें" : "मेनू खोलें"}
@@ -83,11 +96,15 @@ export function SiteHeader() {
         </ul>
       </div>
 
-      {/* Mobile menu */}
+    </header>
+
+      {/* Phone menu. It must stay OUTSIDE <header>: the header's blur (backdrop-filter)
+          would make "fixed" relative to the header and squash this panel to zero height. */}
       <div
         id="mobile-menu"
         hidden={!open}
-        className="fixed inset-x-0 top-[3.95rem] bottom-0 overflow-y-auto border-t border-gold/40 bg-ivory xl:hidden"
+        style={{ top: menuTop }}
+        className="fixed inset-x-0 bottom-0 z-50 overflow-y-auto overscroll-contain border-t border-gold/40 bg-ivory xl:hidden"
       >
         <nav aria-label="मुख्य मेनू" className="mx-auto max-w-lg px-4 pt-3 pb-10">
           <ul className="grid gap-1.5">
@@ -118,6 +135,6 @@ export function SiteHeader() {
           </ul>
         </nav>
       </div>
-    </header>
+    </>
   );
 }

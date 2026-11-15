@@ -54,3 +54,52 @@ test("phone menu opens and lists every menu item", async ({ page, isMobile }) =>
   await expect(page).toHaveURL(/\/udeshya$/);
   await expect(menu).toBeHidden();
 });
+
+// A small phone (375 px). Checks the menu is really ON SCREEN, not just in the page:
+// Playwright counts links clipped inside a zero-height panel as "visible".
+test.describe("phone menu at 375 px", () => {
+  test.use({ viewport: { width: 375, height: 667 }, isMobile: true, hasTouch: true });
+
+  /** True when the element's centre is inside the screen and nothing covers it. */
+  const onTop = (el: Element) => {
+    const r = el.getBoundingClientRect();
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    if (r.width === 0 || r.height === 0 || x < 0 || y < 0 || x > innerWidth || y > innerHeight) return false;
+    const hit = document.elementFromPoint(x, y);
+    return !!hit && (hit === el || el.contains(hit));
+  };
+
+  test("☰ shows every menu item above the page; a link or ✕ closes it", async ({ page }, info) => {
+    test.skip(info.project.name !== "phone", "phone project only");
+    await page.goto("/");
+    const toggle = page.getByRole("button", { name: "मेनू खोलें" });
+    await toggle.tap();
+    const menu = page.locator("#mobile-menu");
+
+    // The panel fills the screen width and most of its height.
+    const box = (await menu.boundingBox())!;
+    expect(box.width).toBeGreaterThanOrEqual(374);
+    expect(box.height).toBeGreaterThan(400);
+
+    // All 11 menu items can be scrolled to and are really on top (not hidden behind the page).
+    const labels = site.header.menu.map((m: { label: string }) => m.label.trim());
+    expect(labels.length + 1).toBe(11);
+    for (const label of [...labels, "फोटो एल्बम"]) {
+      const link = menu.getByRole("link", { name: label, exact: true });
+      await link.scrollIntoViewIfNeeded();
+      expect(await link.evaluate(onTop), label).toBe(true);
+    }
+
+    // फोटो एल्बम can be tapped and opens the album page; the menu closes.
+    await menu.getByRole("link", { name: "फोटो एल्बम", exact: true }).tap();
+    await expect(page).toHaveURL(/\/photo-album$/);
+    await expect(menu).toBeHidden();
+
+    // ✕ closes it too.
+    await page.getByRole("button", { name: "मेनू खोलें" }).tap();
+    await expect(menu).toBeVisible();
+    await page.getByRole("button", { name: "मेनू बंद करें" }).tap();
+    await expect(menu).toBeHidden();
+    await expect(page.getByRole("button", { name: "मेनू खोलें" })).toBeVisible();
+  });
+});
