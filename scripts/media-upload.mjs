@@ -1,5 +1,5 @@
 // Uploads the prepared media folder (.media/, see prepare-media.mjs) to the
-// Cloudflare R2 bucket, keeping the old site's file paths. Files already in the
+// media bucket (Amazon S3), keeping the old site's file paths. Files already in the
 // bucket with the same size are skipped, so it is safe to re-run after a break.
 //
 // Usage: npm run media:upload
@@ -9,8 +9,8 @@ import path from "node:path";
 import { HeadObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { CONTENT_TYPES, MEDIA_STORAGE, r2 } from "./r2.mjs";
 
-if (MEDIA_STORAGE !== "r2") {
-  console.log("MEDIA_STORAGE is not \"r2\": media is served from .media on this computer; nothing to upload.");
+if (MEDIA_STORAGE !== "s3") {
+  console.log("MEDIA_STORAGE is not \"s3\": media is served from .media on this computer; nothing to upload.");
   process.exit(0);
 }
 
@@ -51,7 +51,7 @@ async function upload(key) {
         Body: fs.readFileSync(file),
         ContentLength: size,
         ContentType: CONTENT_TYPES[path.extname(key).toLowerCase()] ?? "application/octet-stream",
-        // Old files never change; let browsers and Cloudflare keep them for a year.
+        // Old files never change; let browsers and CloudFront keep them for a year.
         CacheControl: "public, max-age=31536000, immutable",
       }),
     );

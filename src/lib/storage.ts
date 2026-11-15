@@ -3,7 +3,7 @@ import "server-only";
 // Where uploaded media files (MP3s, photos) are stored.
 //
 //   MEDIA_STORAGE=local  — on this Mac, in the .uploads/ folder (served by /local-media/…)
-//   MEDIA_STORAGE=r2     — Cloudflare R2 / Amazon S3 (any S3-compatible bucket)
+//   MEDIA_STORAGE=s3     — Amazon S3 (or any S3-compatible bucket; "r2" means the same)
 //
 // The browser sends each file STRAIGHT to storage with a short-lived signed
 // address (big pravachan MP3s never pass through the website server's memory).
@@ -14,7 +14,7 @@ import path from "node:path";
 import { DeleteObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-export const STORAGE = process.env.MEDIA_STORAGE === "r2" ? "r2" : "local";
+export const STORAGE = ["s3", "r2"].includes(process.env.MEDIA_STORAGE ?? "") ? "s3" : "local";
 
 /** Local uploads live here (not in git). Old-site files stay in .media/. */
 export const UPLOAD_DIR = path.resolve(process.cwd(), ".uploads");
@@ -121,13 +121,17 @@ export async function deleteObject(key: string): Promise<void> {
 }
 
 function s3() {
-  const { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, S3_ENDPOINT, S3_REGION } = process.env;
-  if (!R2_ACCESS_KEY_ID || !R2_SECRET_ACCESS_KEY || !R2_BUCKET) throw new Error("Storage keys are missing (R2_* in the environment)");
+  const env = process.env;
+  const bucket = env.S3_BUCKET || env.R2_BUCKET;
+  if (!bucket) throw new Error("S3_BUCKET is missing");
+  const accessKeyId = env.S3_ACCESS_KEY_ID || env.R2_ACCESS_KEY_ID;
+  const secretAccessKey = env.S3_SECRET_ACCESS_KEY || env.R2_SECRET_ACCESS_KEY;
+  const r2Endpoint = !env.S3_REGION && env.R2_ACCOUNT_ID ? `https://${env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com` : undefined;
   const client = new S3Client({
-    // Cloudflare R2 by default; Amazon S3 when S3_REGION is set (and no endpoint).
-    region: S3_REGION || "auto",
-    endpoint: S3_ENDPOINT || (S3_REGION ? undefined : `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`),
-    credentials: { accessKeyId: R2_ACCESS_KEY_ID, secretAccessKey: R2_SECRET_ACCESS_KEY },
+    region: env.S3_REGION || "auto",
+    endpoint: env.S3_ENDPOINT || r2Endpoint,
+    // No keys set: the AWS login of this computer, or the website's IAM role on Amplify.
+    credentials: accessKeyId && secretAccessKey ? { accessKeyId, secretAccessKey } : undefined,
   });
-  return { client, bucket: R2_BUCKET };
+  return { client, bucket };
 }
