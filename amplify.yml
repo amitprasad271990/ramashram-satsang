@@ -6,6 +6,8 @@ frontend:
     preBuild:
       commands:
         - nvm install 22 && nvm use 22
+        # Start every build without old saved database answers (see "cache" below).
+        - rm -rf .next/cache
         - npm ci
     build:
       commands:
@@ -18,6 +20,7 @@ frontend:
     files:
       - "**/*"
   cache:
+    # Not .next/cache: it holds saved database answers, which must never carry
+    # over into a new build (pages would show old announcements and lists).
     paths:
-      - .next/cache/**/*
       - node_modules/**/*
