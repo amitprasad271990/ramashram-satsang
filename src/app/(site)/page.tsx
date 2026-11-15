@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { LegacyHtml } from "@/components/LegacyHtml";
 import { Divider } from "@/components/Ornaments";
-import { AnnouncementBar } from "@/components/PageShell";
+import { AnnouncementBar } from "@/components/AnnouncementBar";
 import { Portrait } from "@/components/Portrait";
 import { imageSize, pages, site } from "@/content";
 import { getAnnouncementFor } from "@/lib/data";
@@ -79,7 +79,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {announcement && <AnnouncementBar text={announcement} />}
+      {announcement && <AnnouncementBar text={announcement} announcementKey={pages.home.announcement!} />}
 
       <main id="main" className="mx-auto max-w-5xl px-4 pt-8 sm:px-6 sm:pt-12">
         {/* Anar.mp3 played automatically (hidden) on the old home page; now a visible player, no autoplay */}

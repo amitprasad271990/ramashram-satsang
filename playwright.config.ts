@@ -1,8 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// Tests read the same settings as the site (local Supabase keys).
+// Tests read the same settings as the site: the local Supabase keys, or the
+// live (cloud) ones when testing the deployed site with E2E_BASE_URL.
 try {
-  process.loadEnvFile(".env.local");
+  process.loadEnvFile(process.env.E2E_BASE_URL ? ".env.cloud" : ".env.local");
 } catch {}
 
 const desktop = { ...devices["Desktop Chrome"], viewport: { width: 1366, height: 900 } };
@@ -21,10 +22,13 @@ export default defineConfig({
   reporter: [["list"]],
   use: { baseURL: LIVE || `http://localhost:${PORT}` },
   projects: [
-    { name: "phone", use: { ...devices["Pixel 7"] }, testIgnore: /admin.*\.spec/ },
-    { name: "desktop", use: desktop, testIgnore: /admin.*\.spec/ },
-    // The admin tests change shared data (the announcement), so they run alone, after the others.
-    ...(LIVE ? [] : [{ name: "admin", use: desktop, testMatch: /admin.*\.spec/, dependencies: ["phone", "desktop"] }]),
+    { name: "phone", use: { ...devices["Pixel 7"] }, testIgnore: [/admin.*\.spec/, /live\.spec/] },
+    { name: "desktop", use: desktop, testIgnore: [/admin.*\.spec/, /live\.spec/] },
+    // Tests that change shared data run alone, after the others: the admin tests on this
+    // Mac, or (live site only) the announcement test, which puts the real text back after.
+    LIVE
+      ? { name: "live-write", use: desktop, testMatch: /live\.spec/, dependencies: ["phone", "desktop"] }
+      : { name: "admin", use: desktop, testMatch: /admin.*\.spec/, dependencies: ["phone", "desktop"] },
   ],
   webServer: LIVE ? undefined : {
     // Test the real production build (what visitors get). Set E2E_DEV=1 to use the dev server instead.

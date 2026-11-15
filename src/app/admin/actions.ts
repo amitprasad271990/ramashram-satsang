@@ -43,8 +43,15 @@ export async function saveAnnouncement(_prev: FormState, form: FormData): Promis
   const text = String(form.get("text") ?? "").replace(/\s+/g, " ").trim();
   if (!text) return { error: "सूचना खाली नहीं हो सकती / The announcement cannot be empty" };
   if (text.length > 1000) return { error: "सूचना बहुत लंबी है / The announcement is too long" };
-  const { data, error } = await db.from("announcements").update({ text }).not("key", "is", null).select("key");
-  if (error || !data?.length) return { error: "सहेजा नहीं जा सका / Could not save" };
+  const { data, error } = await db.from("announcements").update({ text }).not("key", "is", null).select("key, text");
+  if (error) {
+    console.error("saveAnnouncement", error);
+    return { error: `सहेजा नहीं जा सका — कृपया फिर से कोशिश करें / Could not save — please try again (${error.message})` };
+  }
+  // Check the database really holds the new line on every row.
+  if (!data?.length || data.some((row) => row.text !== text)) {
+    return { error: "सहेजा नहीं जा सका — डेटाबेस ने बदलाव स्वीकार नहीं किया / Could not save — the database did not accept the change" };
+  }
   revalidatePath("/", "layout"); // refresh every public page
-  return { ok: "सहेज लिया गया — अब सभी पृष्ठों पर दिखेगी / Saved — now shown on all pages" };
+  return { ok: "सहेज लिया गया — कुछ ही सेकंड में सभी पृष्ठों पर दिखेगी / Saved — shown on all pages within a few seconds" };
 }

@@ -5,6 +5,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { PAGES } from "../../scripts/page-map.mjs";
 import site from "../../src/content/legacy/site.json";
+import { currentAnnouncements } from "./db";
 import { firstDifference, loadOld, oldContentText, squash } from "./legacy";
 
 /** Text of the new page's main content, without new UI labels and typed-out image text. */
@@ -30,15 +31,25 @@ test.describe("same text as the old site", () => {
     });
   }
 
-  test("announcement line on every page is the old one, unchanged", async ({ page }) => {
+  test("announcement line on every page is the current one (the old one until the admin changes it)", async ({ page }) => {
+    const db = await currentAnnouncements();
     for (const p of PAGES) {
       const $ = loadOld(p.file);
       const old = $("#ctl00_lbldetails").text();
       // Biography pages had no bar of their own; they opened inside Parichay.
-      const expected = old || loadOld("Parichay.html")("#ctl00_lbldetails").text();
+      const oldText = old || loadOld("Parichay.html")("#ctl00_lbldetails").text();
+      // Which of the two old lines this page showed, and what the database holds for it now.
+      const key = Object.keys(site.announcements).find(
+        (k) => squash(site.announcements[k as keyof typeof site.announcements]) === squash(oldText),
+      );
+      expect(key, `${p.route}: old line is one of the two known announcements`).toBeTruthy();
+      // On a freshly set-up database (this Mac), the line must still be the old site's, word for word.
+      if (!process.env.E2E_BASE_URL) expect(squash(db[key!]), `${p.route} database line`).toBe(squash(oldText));
       await page.goto(p.route);
-      const body = squash((await page.locator("body").textContent()) ?? "");
-      expect(body, `${p.route} announcement`).toContain(squash(expected));
+      await expect(page.locator(`[data-announcement="${key}"]`).first(), `${p.route} announcement`).toHaveText(db[key!], {
+        timeout: 10_000,
+        useInnerText: true,
+      });
     }
   });
 
